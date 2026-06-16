@@ -7,14 +7,14 @@ export async function followUser(followerId: string, followingId: string): Promi
 }
 
 export async function unfollowUser(followerId: string, followingId: string): Promise<void> {
-  await db.follow.deleteMany({
-    where: { followerId, followingId },
+  await db.follow.delete({
+    where: { followerId_followingId: { followerId, followingId } },
   })
 }
 
 export async function isFollowing(followerId: string, followingId: string): Promise<boolean> {
-  const follow = await db.follow.findFirst({
-    where: { followerId, followingId },
+  const follow = await db.follow.findUnique({
+    where: { followerId_followingId: { followerId, followingId } },
   })
   return follow !== null
 }

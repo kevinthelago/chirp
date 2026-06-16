@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }))
-vi.mock("@/lib/auth", () => ({ getCurrentUser: vi.fn() }))
+vi.mock("@/lib/session", () => ({ getCurrentUser: vi.fn() }))
 vi.mock("@/lib/follow", () => ({
   followUser: vi.fn(),
   unfollowUser: vi.fn(),
@@ -10,7 +10,7 @@ vi.mock("@/lib/follow", () => ({
 
 import { toggleFollow } from "./follow"
 import { revalidatePath } from "next/cache"
-import { getCurrentUser } from "@/lib/auth"
+import { getCurrentUser } from "@/lib/session"
 import { followUser, unfollowUser, isFollowing } from "@/lib/follow"
 
 beforeEach(() => {

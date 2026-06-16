@@ -1,7 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { getCurrentUser } from "@/lib/auth"
+import { getCurrentUser } from "@/lib/session"
 import { followUser, unfollowUser, isFollowing } from "@/lib/follow"
 
 export async function toggleFollow(
