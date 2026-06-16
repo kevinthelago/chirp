@@ -1,17 +1,17 @@
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
-import { getSession } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/session";
 import ProfileForm from "./_components/ProfileForm";
 
 export const metadata: Metadata = { title: "Edit profile" };
 
 export default async function SettingsPage() {
-  const session = await getSession();
+  const session = await getCurrentUser();
   if (!session) redirect("/login");
 
   const user = await db.user.findUnique({
-    where: { id: session.userId },
+    where: { id: session.id },
     select: { displayName: true, bio: true },
   });
 

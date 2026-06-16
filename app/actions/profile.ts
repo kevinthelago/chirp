@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
-import { getSession } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/session";
 
 const schema = z.object({
   displayName: z
@@ -25,7 +25,7 @@ export async function updateProfile(
   _prev: UpdateProfileState,
   formData: FormData,
 ): Promise<UpdateProfileState> {
-  const session = await getSession();
+  const session = await getCurrentUser();
   if (!session) return { error: "You must be signed in to update your profile." };
 
   const parsed = schema.safeParse({
@@ -38,13 +38,13 @@ export async function updateProfile(
   }
 
   await db.user.update({
-    where: { id: session.userId },
+    where: { id: session.id },
     data: {
       displayName: parsed.data.displayName,
       bio: parsed.data.bio ?? null,
     },
   });
 
-  revalidatePath(`/${session.handle}`);
+  revalidatePath(`/${session.handle ?? ""}`);
   return { success: true };
 }

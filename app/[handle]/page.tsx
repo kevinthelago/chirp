@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { getSession } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/session";
 import ChirpCard from "@/components/ChirpCard";
 import FollowButton from "@/components/FollowButton";
 
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProfilePage({ params }: Props) {
   const { handle } = await params;
-  const session = await getSession();
+  const session = await getCurrentUser();
 
   const user = await db.user.findUnique({
     where: { handle },
@@ -49,14 +49,14 @@ export default async function ProfilePage({ params }: Props) {
 
   if (!user) notFound();
 
-  const isOwner = session?.userId === user.id;
+  const isOwner = session?.id === user.id;
 
   const [followRow, likedIds] = await Promise.all([
     !isOwner && session
       ? db.follow.findUnique({
           where: {
             followerId_followingId: {
-              followerId: session.userId,
+              followerId: session.id,
               followingId: user.id,
             },
           },
@@ -67,7 +67,7 @@ export default async function ProfilePage({ params }: Props) {
       ? db.like
           .findMany({
             where: {
-              userId: session.userId,
+              userId: session.id,
               chirpId: { in: user.chirps.map((c) => c.id) },
             },
             select: { chirpId: true },
@@ -123,7 +123,7 @@ export default async function ProfilePage({ params }: Props) {
             <ChirpCard
               key={chirp.id}
               chirp={chirp}
-              currentUserId={session?.userId}
+              currentUserId={session?.id}
               liked={likedIds.has(chirp.id)}
             />
           ))
