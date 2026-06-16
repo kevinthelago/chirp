@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import React, { useState, useTransition } from "react"
 import { toggleFollow } from "@/app/actions/follow"
 
 interface FollowButtonProps {
