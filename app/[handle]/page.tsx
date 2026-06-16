@@ -4,7 +4,8 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
 import ChirpCard from "@/components/ChirpCard";
-import FollowButton from "@/components/FollowButton";
+import { FollowButton } from "@/components/FollowButton";
+import { LikeButton } from "@/components/LikeButton";
 
 interface Props {
   params: Promise<{ handle: string }>;
@@ -40,7 +41,7 @@ export default async function ProfilePage({ params }: Props) {
       chirps: {
         orderBy: { createdAt: "desc" },
         include: {
-          author: { select: { handle: true, displayName: true } },
+          author: { select: { id: true, handle: true, displayName: true } },
           _count: { select: { likes: true } },
         },
       },
@@ -110,7 +111,11 @@ export default async function ProfilePage({ params }: Props) {
               Edit profile
             </Link>
           ) : session && !isOwner ? (
-            <FollowButton targetUserId={user.id} isFollowing={isFollowing} />
+            <FollowButton
+              targetUserId={user.id}
+              targetHandle={user.handle}
+              initialIsFollowing={isFollowing}
+            />
           ) : null}
         </div>
       </section>
@@ -124,7 +129,13 @@ export default async function ProfilePage({ params }: Props) {
               key={chirp.id}
               chirp={chirp}
               currentUserId={session?.id}
-              liked={likedIds.has(chirp.id)}
+              likeSlot={
+                <LikeButton
+                  chirpId={chirp.id}
+                  initialCount={chirp._count.likes}
+                  initialLiked={likedIds.has(chirp.id)}
+                />
+              }
             />
           ))
         )}
